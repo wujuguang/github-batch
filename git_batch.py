@@ -24,20 +24,23 @@ class GitTool(object):
         self.unix_shell = shells
         self.log_file = log
 
+    def _print(self, info=''):
+        if self.log_file:
+            os.system("echo %s >> %s" % (info, self.log_file))
+        else:
+            print(info)
+
     def run_work(self):
         """对指定的操作目录, 执行指定的操作命令.
         """
 
         # 如果传入日志路径不存在则创建
         if self.log_file:
+            dir_name = os.path.dirname(self.log_file)
+            if not os.path.exists(dir_name):
+                os.makedirs(dir_name)
             if not os.path.exists(self.log_file):
                 os.mknod(self.log_file)
-
-        def _print(info=''):
-            if self.log_file:
-                os.system("echo %s >> %s" % (info, self.log_file))
-            else:
-                print(info)
 
         def process_target_path(target_path):
             """对指定目录执行操作.
@@ -47,12 +50,8 @@ class GitTool(object):
 
             # 判断路径是否存在
             if not os.path.exists(target_path):
-                _print("Directory does not exist!")
+                self._print("Directory does not exist!")
                 return
-
-            if self.log_file:
-                now_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                _print("%s %s %s" % ("=" * 40, now_time, "=" * 40))
 
             # 遍历目录下的Git Repository
             for i in os.listdir(target_path):
@@ -60,11 +59,14 @@ class GitTool(object):
 
                 # sub_path类型为目录, 并且存在.git且为目录, 视为Git Repository
                 git_path = os.path.join(sub_path, ".git")
-                if os.path.isdir(sub_path) and os.path.exists(git_path) and os.path.isdir(git_path):
-                    start_info = "Starting: %(sub_dir)s %(ph)s" % {'sub_dir': i, 'ph': "." * (80 - len(i) - 1)}
-                    _print(start_info)
-                    os.system(self.unix_shell % sub_path)
-                    _print()
+                if os.path.isdir(sub_path):
+                    if os.path.exists(git_path) and os.path.isdir(git_path):
+                        start_info = "Starting: %(sub_dir)s %(ph)s" % {'sub_dir': i, 'ph': "." * (80 - len(i) - 1)}
+                        self._print(start_info)
+                        os.system(self.unix_shell % sub_path)
+                        self._print()
+                    else:
+                        process_target_path(sub_path)
 
         if isinstance(self.directory, basestring):
             process_target_path(self.directory)
@@ -74,7 +76,11 @@ class GitTool(object):
         else:
             pass
 
-        _print("Ok,All work is done!\r")
+        self._print("Ok,All work is done!\r")
 
     def __call__(self):
+        if self.log_file:
+            now_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            self._print("%s %s %s" % ("=" * 35, now_time, "=" * 35))
+
         self.run_work()
