@@ -17,6 +17,7 @@ if __name__ == '__main__':
     shells_str = ''.join(("cd %s && ", shells_str % {"log": report_log}))
 
     repository = GitTool(parent_path=git_fork_dir, shells=shells_str, log=report_log)
+    repository.build_tree = True
     repository()
 
     report_log = os.path.join(logs_dir, "plugins.log")
