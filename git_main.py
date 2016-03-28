@@ -2,7 +2,7 @@
 # coding: utf-8
 
 import os
-import os.path
+
 from git_batch import GitTool
 from git_conf import git_fork_dir, mux_plug_dir
 

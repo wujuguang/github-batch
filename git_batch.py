@@ -7,8 +7,9 @@
 from __future__ import print_function, unicode_literals
 
 import os
-import os.path
-from datetime import datetime
+import datetime
+
+import six
 from treelib import Tree
 
 
@@ -133,7 +134,7 @@ class GitTool(object):
                     else:
                         process_target_path(sub_path, sub_name)
 
-        if isinstance(self._directory, basestring):
+        if isinstance(self._directory, six.string_types):
             build_tree(self._directory)
             process_target_path(self._directory)
             report_tree(self._directory)
@@ -149,7 +150,7 @@ class GitTool(object):
 
     def __call__(self):
         if self._log_file:
-            now_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             self._print("%s %s %s" % ("=" * 35, now_time, "=" * 35))
 
         self.run_work()
