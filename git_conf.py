@@ -3,7 +3,8 @@
 
 git_repository_dir = [
     "/home/kylin/Mywork/",
-    "/home/kylin/Program/kytmux/tmux/plugins"
+    "/home/kylin/Program/kyvim/vim/bundle",
+    "/home/kylin/Program/kytmux/tmux/plugins",
 ]
 
 git_fork_dir = [
