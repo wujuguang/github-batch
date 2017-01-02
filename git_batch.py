@@ -112,7 +112,8 @@ class GitTool(object):
                 self._print("Directory does not exist!")
                 return
 
-            parent_name = os.path.basename(target_path) if not target_tag else target_tag
+            parent_name = os.path.basename(
+                target_path) if not target_tag else target_tag
 
             # 遍历目录下的Git Repository
             for i in os.listdir(target_path):
@@ -124,10 +125,14 @@ class GitTool(object):
                 if os.path.isdir(sub_path):
                     sub_name = exist_node(sub_name)
                     if self._build_tree:
-                        self._tree.create_node(sub_name, sub_name, parent=parent_name)
+                        self._tree.create_node(
+                            sub_name,
+                            sub_name,
+                            parent=parent_name)
 
                     if os.path.exists(git_path) and os.path.isdir(git_path):
-                        start_info = "Starting: %(sub_dir)s %(ph)s" % {'sub_dir': i, 'ph': "." * (80 - len(i) - 1)}
+                        start_info = "Starting: %(sub_dir)s %(ph)s" % {
+                            'sub_dir': i, 'ph': "." * (80 - len(i) - 1)}
                         self._print(start_info)
                         os.system(self._unix_shell % sub_path)
                         self._print()
