@@ -4,8 +4,6 @@
 """批量更新指定目录下存储的所有Git Repository.
 """
 
-from __future__ import print_function, unicode_literals
-
 import os
 import datetime
 

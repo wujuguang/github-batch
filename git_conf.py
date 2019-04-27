@@ -2,11 +2,11 @@
 # coding: utf-8
 
 git_repository_dir = [
-    "/home/kylin/Mywork/",
-    "/home/kylin/Program/kyvim/vim/bundle",
-    "/home/kylin/Program/kytmux/tmux/plugins",
+    # "/home/kylinfish/Mywork/",
+    "/home/kylinfish/Program/kyvim/vim/bundle",
+    "/home/kylinfish/Program/kytmux/tmux/plugins",
 ]
 
 git_fork_dir = [
-    "/home/kylin/GitHub/third-party/",
+    "/home/kylinfish/GitHub/third-party/",
 ]
