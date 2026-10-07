@@ -1,22 +1,22 @@
-#!usr/bin/env python
-# coding: utf-8
+#!/usr/bin/env python3
 
 """批量更新指定目录下存储的所有Git Repository.
 """
 
 import os
+import shlex
 import datetime
+import subprocess
 
-import six
 from treelib import Tree
 
 
-class GitTool(object):
+class GitTool:
     def __init__(self, parent_path, shells, build_tree=False, log=None):
         """初始化操作目录, 操作命令.
 
             :parameter parent_path: 操作目录
-            :parameter shells:　执行shell
+            :parameter shells:　执行shell, 其中{path}为仓库路径占位符
             :parameter build_tree: 是否生成树形导航
             :parameter log: log文件
         """
@@ -37,7 +37,8 @@ class GitTool(object):
 
     def _print(self, info=''):
         if self._log_file:
-            os.system("echo %s >> %s" % (info, self._log_file))
+            with open(self._log_file, 'a') as f:
+                f.write(info + '\n')
         else:
             print(info)
 
@@ -48,10 +49,10 @@ class GitTool(object):
         # 如果传入日志路径不存在则创建
         if self._log_file:
             dir_name = os.path.dirname(self._log_file)
-            if not os.path.exists(dir_name):
+            if dir_name and not os.path.exists(dir_name):
                 os.makedirs(dir_name)
             if not os.path.exists(self._log_file):
-                os.mknod(self._log_file)
+                open(self._log_file, 'a').close()
 
         def build_tree(target_path):
             """创建树节点.
@@ -94,7 +95,7 @@ class GitTool(object):
 
             if out_file:
                 report_file = os.path.basename(target_path.strip(os.path.sep))
-                self._tree.save2file('%s.txt' % report_file)
+                self._tree.save2file(f'{report_file}.txt')
             else:
                 self._tree.show()
 
@@ -118,7 +119,8 @@ class GitTool(object):
                 sub_path = os.path.join(target_path, i)
                 sub_name = os.path.basename(sub_path)
 
-                # sub_path类型为目录, 并且存在.git且为目录, 视为Git Repository
+                # sub_path类型为目录, 且存在.git(目录或文件), 视为Git Repository
+                # .git为文件时对应submodule或worktree
                 git_path = os.path.join(sub_path, ".git")
                 if os.path.isdir(sub_path):
                     sub_name = exist_node(sub_name)
@@ -128,16 +130,17 @@ class GitTool(object):
                             sub_name,
                             parent=parent_name)
 
-                    if os.path.exists(git_path) and os.path.isdir(git_path):
-                        start_info = "Starting: %(sub_dir)s %(ph)s" % {
-                            'sub_dir': i, 'ph': "." * (80 - len(i) - 1)}
+                    if os.path.exists(git_path):
+                        start_info = f"Starting: {i} {'.' * (80 - len(i) - 1)}"
                         self._print(start_info)
-                        os.system(self._unix_shell % sub_path)
+                        subprocess.run(
+                            self._unix_shell.format(path=shlex.quote(sub_path)),
+                            shell=True)
                         self._print()
                     else:
                         process_target_path(sub_path, sub_name)
 
-        if isinstance(self._directory, six.string_types):
+        if isinstance(self._directory, str):
             build_tree(self._directory)
             process_target_path(self._directory)
             report_tree(self._directory)
@@ -154,6 +157,6 @@ class GitTool(object):
     def __call__(self):
         if self._log_file:
             now_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            self._print("%s %s %s" % ("=" * 35, now_time, "=" * 35))
+            self._print(f"{'=' * 35} {now_time} {'=' * 35}")
 
         self.run_work()
